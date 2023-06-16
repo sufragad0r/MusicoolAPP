@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Musicool</string>
+    <string name="m_musicool">M</string>
+    <string name="usicool_musicool">usicool</string>
+    <string name="lo_slogan">Lo&#160;</string>
+    <string name="cool_slogan">cool&#160;</string>
+    <string name="de_slogan">de hacerse&#160;</string>
+    <string name="sonar_slogan">sonar</string>
+    <string name="punto_slogan">.</string>
+    <string name="nombreDeUsuario">Nombre de usuario</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="esconderContrasena">Ocultar contraseña\n</string>
+    <string name="mostrarContrasena">Mostrar contraseña\n</string>
+    <string name="registrate">Registrate</string>
+    <string name="telefono">Telefono</string>
+    <string name="noTienesCuenta_pregunta">¿No tienes cuenta?&#160;</string>
+    <string name="creaUna">Crea una</string>
+    <string name="yaTienesCuenta_pregunta">¿Ya tienes una cuenta?&#160;</string>
+    <string name="iniciaSesion">Inicia sesion</string>
+</resources>
