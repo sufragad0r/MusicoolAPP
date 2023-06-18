@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.datos.validacion.Validador
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
-import kotlin.math.log
+import com.musicoolapp.musicool.red.MusicoolAPI
 
 class InicioSesionViewModel : ViewModel() {
 
@@ -31,21 +31,31 @@ class InicioSesionViewModel : ViewModel() {
                 )
             }
             is InicioSesionUIEvent.botonDeIniciarSesionClickeado -> {
-                iniciarSesion()
+                iniciarSesion(inicioSesionUIState.value.nombreUsuario, inicioSesionUIState.value.contrasena)
             }
         }
     }
 
-    private fun iniciarSesion() {
-        if(inicioSesionUIState.value.nombreUsuarioError || inicioSesionUIState.value.contrasenaError){
-            Log.d("REGISTRO FALLIDO", "Datos invalidos")
+    private fun iniciarSesion(nombreUsuario: String, contrasena: String) {
+        if (inicioSesionUIState.value.nombreUsuarioError || inicioSesionUIState.value.contrasenaError) {
+            Log.d("REGISTRO FALLIDO", "Datos inválidos")
             mostrarEstado()
-        }else{
-            Log.d("REGISTRO EXITOSO", "Datos validos")
-            MusicoolEnrutador.navegarHacia(Pantalla.CodigoOTPPantalla)
+        } else {
+            MusicoolAPI().iniciarSesion(nombreUsuario, contrasena) { otpRespuesta ->
+                if (otpRespuesta != null) {
+                    inicioSesionUIState.value = inicioSesionUIState.value.copy(
+                        otpRespuesta = otpRespuesta
+                    )
+                    if (otpRespuesta.solicitarOTP == "True") {
+                        Log.d("REGISTRO EXITOSO", "Datos válidos")
+                        MusicoolEnrutador.navegarHacia(Pantalla.CodigoOTPPantalla)
+                    }
+                } else {
+                    Log.d("REGISTRO FALLIDO", "Error del servidor")
+                }
+            }
         }
     }
-
     private fun mostrarEstado(){
         Log.d("INICIO SESION", inicioSesionUIState.value.toString())
     }
