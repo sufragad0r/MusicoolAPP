@@ -49,14 +49,15 @@ fun InicioSesionPantalla(){
             ) {
                 Formulario(nombre = stringResource(id = R.string.nombreDeUsuario), icono = painterResource(
                     id = R.drawable.usuario
-                ))
+                ), onTextSelected = {})
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                FormularioContrasena(nombre = "Contraseña", icono = painterResource(id = R.drawable.candado))
+                FormularioContrasena(nombre = "Contraseña", icono = painterResource(id = R.drawable.candado),
+                    onTextSelected = {})
             }
             Spacer(modifier = Modifier.height(50.dp))
             Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {

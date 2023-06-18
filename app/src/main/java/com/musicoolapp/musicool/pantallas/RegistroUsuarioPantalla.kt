@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.musicoolapp.musicool.R
 import com.musicoolapp.musicool.componentes.Boton
 import com.musicoolapp.musicool.componentes.Formulario
@@ -27,12 +28,14 @@ import com.musicoolapp.musicool.componentes.LoCool
 import com.musicoolapp.musicool.componentes.Musicool
 import com.musicoolapp.musicool.componentes.TextoBold
 import com.musicoolapp.musicool.componentes.TextoPresionable
+import com.musicoolapp.musicool.datos.registroUsuario.RegistroUsuarioViewModel
+import com.musicoolapp.musicool.datos.registroUsuario.RegistroUsuarioUIEvent
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
 import com.musicoolapp.musicool.navegacion.SystemBackButtonHandler
 
 @Composable
-fun RegistroUsuarioPantalla() {
+fun RegistroUsuarioPantalla(registroUsuarioViewModel: RegistroUsuarioViewModel = viewModel()) {
     Surface(
         color = colorResource(id = R.color.fondo),
         modifier = Modifier
@@ -58,7 +61,9 @@ fun RegistroUsuarioPantalla() {
             ) {
                 Formulario(nombre = stringResource(id = R.string.nombreDeUsuario), icono = painterResource(
                     id = R.drawable.usuario
-                )
+                ), onTextSelected = {
+                    registroUsuarioViewModel.onEvent(RegistroUsuarioUIEvent.nombreUsuarioCambio(it))
+                }, hayError = registroUsuarioViewModel.registroUsuarioUIState.value.nombreUsuarioError
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -68,7 +73,9 @@ fun RegistroUsuarioPantalla() {
             ) {
                 Formulario(nombre = stringResource(id = R.string.telefono), icono = painterResource(
                     id = R.drawable.telefono
-                )
+                ), onTextSelected = {
+                    registroUsuarioViewModel.onEvent(RegistroUsuarioUIEvent.telefonoCambio(it))
+                }, hayError = registroUsuarioViewModel.registroUsuarioUIState.value.telefonoError
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -76,11 +83,15 @@ fun RegistroUsuarioPantalla() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                FormularioContrasena(nombre = "Contraseña", icono = painterResource(id = R.drawable.candado))
+                FormularioContrasena(nombre = "Contraseña", icono = painterResource(id = R.drawable.candado),
+                onTextSelected = {
+                    registroUsuarioViewModel.onEvent((RegistroUsuarioUIEvent.contrasenaCambio(it)))
+                }, hayError = registroUsuarioViewModel.registroUsuarioUIState.value.contrasenaError)
             }
             Spacer(modifier = Modifier.height(15.dp))
             Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
-                Boton(nombre = "Crear cuenta", cuandoLoPulsen = { /*TODO*/ })
+                Boton(nombre = "Crear cuenta", cuandoLoPulsen = { registroUsuarioViewModel.onEvent(
+                    RegistroUsuarioUIEvent.botonDeCrearCuentaClickeado) })
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(

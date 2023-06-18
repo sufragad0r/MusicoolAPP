@@ -108,7 +108,10 @@ fun TextoMedio(texto:String, color:Color, tamano: Int, modifier: Modifier){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Formulario(nombre: String, icono: Painter){
+fun Formulario(nombre: String, icono: Painter,
+               onTextSelected: (String) -> Unit,
+               hayError: Boolean = false
+){
     val texto = remember {
         mutableStateOf("")
     }
@@ -120,29 +123,32 @@ fun Formulario(nombre: String, icono: Painter){
             focusedBorderColor = Color.Transparent,
             focusedLabelColor = colorResource(id = R.color.texto),
             cursorColor = colorResource(id = R.color.moradoCool),
-            containerColor = colorResource(id = R.color.formulario)
+            containerColor = colorResource(id = R.color.formulario),
+            errorBorderColor = colorResource(id = R.color.rojoCool)
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         singleLine = true,
         maxLines = 1,
         value = texto.value,
         onValueChange = {
-    texto.value = it
-},
+            texto.value = it
+            onTextSelected(it) },
 modifier = Modifier
     .height(69.dp)
-    .width(273.dp)
-    .clip(RoundedCornerShape(50.dp)),
+    .width(300.dp)
+    .clip(RoundedCornerShape(5.dp)),
 leadingIcon = {
     Icon(painter = icono, contentDescription = "")
-}
+}, isError = hayError
 )
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormularioContrasena(nombre: String, icono: Painter){
+fun FormularioContrasena(nombre: String, icono: Painter,
+                         onTextSelected: (String) -> Unit,
+                         hayError: Boolean = false){
     val localFocusManager = LocalFocusManager.current
     val contrasena = remember {
         mutableStateOf("")
@@ -158,7 +164,9 @@ fun FormularioContrasena(nombre: String, icono: Painter){
             focusedBorderColor = Color.Transparent,
             focusedLabelColor = colorResource(id = R.color.texto),
             cursorColor = colorResource(id = R.color.moradoCool),
-            containerColor = colorResource(id = R.color.formulario)
+            containerColor = colorResource(id = R.color.formulario),
+            errorBorderColor = colorResource(id = R.color.rojoCool),
+            errorTrailingIconColor = colorResource(id = R.color.rojoCool)
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
@@ -172,14 +180,15 @@ fun FormularioContrasena(nombre: String, icono: Painter){
         value = contrasena.value,
         onValueChange = {
             contrasena.value = it
+            onTextSelected(it)
         },
         modifier = Modifier
             .height(69.dp)
-            .width(273.dp)
-            .clip(RoundedCornerShape(50.dp)),
+            .width(300.dp)
+            .clip(RoundedCornerShape(5.dp)),
         leadingIcon = {
             Icon(painter = icono, contentDescription = "")
-        },
+        }, isError = hayError,
         trailingIcon = {
             val iconoActivo = if(verContrasena.value){
                 painterResource(id = R.drawable.ojo)
@@ -217,7 +226,6 @@ fun TextoPresionable(texto: String, textoResaltado: String, enTextoSeleccionado:
 
         annotatedString.getStringAnnotations(offset, offset)
             .firstOrNull()?.also { span ->
-                Log.d("ClickableTextComponent", "{${span.item}}")
                 if (span.item == textoResaltado) {
                     enTextoSeleccionado(textoResaltado)
                 }
@@ -227,7 +235,7 @@ fun TextoPresionable(texto: String, textoResaltado: String, enTextoSeleccionado:
 }
 
 @Composable
-fun Boton(nombre: String, cuandoLoPulsen: () -> Unit, estaActivo: Boolean = false) {
+fun Boton(nombre: String, cuandoLoPulsen: () -> Unit, estaActivo: Boolean = true) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
