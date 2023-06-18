@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.datos.validacion.Validador
+import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
+import com.musicoolapp.musicool.navegacion.Pantalla
 
 class RegistroUsuarioViewModel : ViewModel() {
     var registroUsuarioUIState = mutableStateOf(RegistroUsuarioUIState())
@@ -46,7 +48,7 @@ class RegistroUsuarioViewModel : ViewModel() {
             mostrarEstado()
         }else{
             Log.d("REGISTRO EXITOSO", "Datos validos")
-            mostrarEstado()
+            MusicoolEnrutador.navegarHacia(Pantalla.InicioSesionPantalla)
         }
     }
 

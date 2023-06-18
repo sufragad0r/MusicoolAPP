@@ -18,6 +18,19 @@ object Validador {
             error
         )
     }
+
+    fun validarCodigoOTP(codigoOTP: String): ResultadoDeValidacion{
+        var error = false
+        if (!codigoOTP.matches(Regex("[0-9]+"))){
+            error = true
+        }
+        if (codigoOTP.length != 6){
+            error = true
+        }
+        return ResultadoDeValidacion(
+            error
+        )
+    }
 }
 
 data class ResultadoDeValidacion(
