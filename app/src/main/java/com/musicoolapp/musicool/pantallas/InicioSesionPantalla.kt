@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.musicoolapp.musicool.R
 import com.musicoolapp.musicool.componentes.Boton
 import com.musicoolapp.musicool.componentes.Formulario
@@ -25,12 +26,15 @@ import com.musicoolapp.musicool.componentes.FormularioContrasena
 import com.musicoolapp.musicool.componentes.LoCool
 import com.musicoolapp.musicool.componentes.Musicool
 import com.musicoolapp.musicool.componentes.TextoPresionable
+import com.musicoolapp.musicool.datos.inicioSesion.InicioSesionUIEvent
+import com.musicoolapp.musicool.datos.inicioSesion.InicioSesionViewModel
+import com.musicoolapp.musicool.datos.registroUsuario.RegistroUsuarioUIEvent
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
 
 
 @Composable
-fun InicioSesionPantalla(){
+fun InicioSesionPantalla(inicioSesionViewModel: InicioSesionViewModel = viewModel()){
     Surface(
         color = colorResource(id = R.color.fondo),
         modifier = Modifier
@@ -49,7 +53,9 @@ fun InicioSesionPantalla(){
             ) {
                 Formulario(nombre = stringResource(id = R.string.nombreDeUsuario), icono = painterResource(
                     id = R.drawable.usuario
-                ), onTextSelected = {})
+                ), onTextSelected = {
+                    inicioSesionViewModel.onEvent(InicioSesionUIEvent.nombreUsuarioCambio(it))
+                }, hayError = inicioSesionViewModel.inicioSesionUIState.value.nombreUsuarioError)
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
@@ -57,11 +63,17 @@ fun InicioSesionPantalla(){
                 horizontalArrangement = Arrangement.Center
             ) {
                 FormularioContrasena(nombre = "Contraseña", icono = painterResource(id = R.drawable.candado),
-                    onTextSelected = {})
+                    onTextSelected = {
+                        inicioSesionViewModel.onEvent(InicioSesionUIEvent.contrasenaCambio(it))
+                    }, hayError = inicioSesionViewModel.inicioSesionUIState.value.contrasenaError
+                )
             }
             Spacer(modifier = Modifier.height(50.dp))
             Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
-                Boton(nombre = "Ingresar", cuandoLoPulsen = {})
+                Boton(nombre = "Ingresar", cuandoLoPulsen = {
+                    inicioSesionViewModel.onEvent(
+                        InicioSesionUIEvent.botonDeIniciarSesionClickeado)
+                })
             }
             Spacer(modifier = Modifier.height(15.dp))
             Row(

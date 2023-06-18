@@ -14,22 +14,30 @@ class RegistroUsuarioViewModel : ViewModel() {
                 registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
                     nombreUsuario = event.nombreUsuario
                 )
+                registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
+                    nombreUsuarioError = Validador.validarTexto(registroUsuarioUIState.value.nombreUsuario).estado
+                )
             }
             is RegistroUsuarioUIEvent.telefonoCambio -> {
                 registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
                     telefono = event.telefono
+                )
+                registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
+                    telefonoError = Validador.validarTelefono(registroUsuarioUIState.value.telefono).estado
                 )
             }
             is RegistroUsuarioUIEvent.contrasenaCambio -> {
                 registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
                     contrasena = event.contrasena
                 )
+                registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
+                    contrasenaError = Validador.validarTexto(registroUsuarioUIState.value.contrasena).estado
+                )
             }
             is RegistroUsuarioUIEvent.botonDeCrearCuentaClickeado -> {
                 registrarUsuario()
             }
         }
-        validarDatos()
     }
 
     private fun registrarUsuario() {
@@ -40,14 +48,6 @@ class RegistroUsuarioViewModel : ViewModel() {
             Log.d("REGISTRO EXITOSO", "Datos validos")
             mostrarEstado()
         }
-    }
-
-    private fun validarDatos() {
-        registroUsuarioUIState.value = registroUsuarioUIState.value.copy(
-            nombreUsuarioError = Validador.validarTexto(registroUsuarioUIState.value.nombreUsuario).estado,
-            telefonoError = Validador.validarTelefono(registroUsuarioUIState.value.telefono).estado,
-            contrasenaError = Validador.validarTexto(registroUsuarioUIState.value.contrasena).estado
-        )
     }
 
     private fun mostrarEstado(){
