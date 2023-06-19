@@ -55,8 +55,8 @@ class MenuInicioViewModel : ViewModel() {
                 menuInicioUIState.value = menuInicioUIState.value.copy(
                     id = id.toString()
                 )
+                Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
             }
-            Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
         }
 
     }

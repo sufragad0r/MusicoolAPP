@@ -19,7 +19,7 @@ import java.io.FileOutputStream
 
 class MusicoolAPI {
 
-    val BASE_URL = "http://192.168.1.161:8000/"
+    val BASE_URL = "http://192.168.43.130:8000/"
     val BASIC_AUTH_KEY = "clienteMovil"
     val BASIC_AUTH_VALUE ="fR5^hN7*oP#2"
 
@@ -29,8 +29,8 @@ class MusicoolAPI {
                 val connection = URL(BASE_URL + "login").openConnection() as HttpURLConnection
 
                 connection.requestMethod = "POST"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 15000
+                connection.readTimeout = 15000
                 connection.setRequestProperty("accept", "application/json")
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
 
@@ -84,8 +84,8 @@ class MusicoolAPI {
                 val connection = URL(BASE_URL + "login/auth").openConnection() as HttpURLConnection
 
                 connection.requestMethod = "POST"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 15000
+                connection.readTimeout = 15000
                 connection.setRequestProperty("accept", "application/json")
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
 
@@ -137,8 +137,8 @@ class MusicoolAPI {
                 val url = URL(BASE_URL + "usuarios")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 15000
+                connection.readTimeout = 15000
                 connection.setRequestProperty("accept", "application/json")
                 connection.setRequestProperty("Content-Type", "application/json")
 
