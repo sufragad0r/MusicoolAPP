@@ -9,6 +9,7 @@ data class MenuInicioUIState(
     var id: String = "",
     var rutaDelCelularDeCancion: String = "",
     var imagen: ImageBitmap? = null,
+    var cancionDisponible: Boolean = false,
 
     var nombreCancionError: Boolean = false,
     var artistaError: Boolean = false
