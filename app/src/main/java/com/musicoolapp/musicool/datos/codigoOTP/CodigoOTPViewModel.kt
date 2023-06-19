@@ -6,6 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.datos.validacion.Validador
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
+import com.musicoolapp.musicool.red.MusicoolAPI
+import com.musicoolapp.musicool.sesion.Sesion
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class CodigoOTPViewModel : ViewModel(){
     var codigoOTPUIState = mutableStateOf(
@@ -22,19 +26,28 @@ class CodigoOTPViewModel : ViewModel(){
                     codigoOTPError = Validador.validarCodigoOTP(codigoOTPUIState.value.codigoOTP).estado
                 )
             }
-            is CodigoOTPUIEvent.botonDeEnviarClickeado -> {
-                irAlMenuPrincipal()
-            }
         }
     }
 
-    private fun irAlMenuPrincipal() {
+    fun irAlMenuPrincipal(nombreUsuario: String, dataStore: Sesion, scope: CoroutineScope) {
         if(codigoOTPUIState.value.codigoOTPError){
             Log.d("CODIGO OTP", "Codigo OTP invalido")
             mostrarEstado()
         }else{
-            Log.d("CODIGO OTP", "Codigo OTP valido")
-            MusicoolEnrutador.navegarHacia(Pantalla.MenuInicioPantalla)
+            MusicoolAPI().codigoOTP(nombreUsuario, codigoOTPUIState.value.codigoOTP){ token ->
+                if (token != null) {
+                    if (token.access_token != null) {
+                        scope.launch {
+                            dataStore.guardarToken(token.access_token)
+                        }
+                        MusicoolEnrutador.navegarHacia(Pantalla.MenuInicioPantalla)
+                        Log.d("CODIGO OTP EXITOSO", dataStore.toString())
+                    } else {
+                        Log.d("REGISTRO FALLIDO", "Error del servidor")
+                        MusicoolEnrutador.navegarHacia(Pantalla.InicioSesionPantalla)
+                    }
+                }
+            }
         }
     }
 

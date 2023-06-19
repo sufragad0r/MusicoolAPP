@@ -1,5 +1,6 @@
 package com.musicoolapp.musicool.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,9 +38,20 @@ import com.musicoolapp.musicool.datos.inicioSesion.InicioSesionUIEvent
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
 import com.musicoolapp.musicool.navegacion.SystemBackButtonHandler
+import com.musicoolapp.musicool.sesion.Sesion
 
 @Composable
 fun CodigoOTPPantalla(codigoOTPViewModel: CodigoOTPViewModel = viewModel()) {
+
+    // context
+    val context = LocalContext.current
+    // scope
+    val scope = rememberCoroutineScope()
+    // datastore Email
+    val dataStore = Sesion(context)
+    // get saved email
+    val usuario = dataStore.conseguirNombreUsuario.collectAsState(initial = "").value ?: ""
+
     Surface(
         color = colorResource(id = R.color.fondo),
         modifier = Modifier
@@ -78,8 +93,7 @@ fun CodigoOTPPantalla(codigoOTPViewModel: CodigoOTPViewModel = viewModel()) {
             Spacer(modifier = Modifier.height(50.dp))
             Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
                 Boton(nombre = "Enviar", cuandoLoPulsen = {
-                    codigoOTPViewModel.onEvent(
-                        CodigoOTPUIEvent.botonDeEnviarClickeado)
+                    codigoOTPViewModel.irAlMenuPrincipal(usuario, dataStore, scope)
                 })
             }
             Spacer(modifier = Modifier.height(15.dp))

@@ -2,6 +2,7 @@ package com.musicoolapp.musicool.datos.inicioSesion
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.datos.validacion.Validador
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
@@ -39,7 +40,6 @@ class InicioSesionViewModel : ViewModel() {
     private fun iniciarSesion(nombreUsuario: String, contrasena: String) {
         if (inicioSesionUIState.value.nombreUsuarioError || inicioSesionUIState.value.contrasenaError) {
             Log.d("REGISTRO FALLIDO", "Datos inválidos")
-            mostrarEstado()
         } else {
             MusicoolAPI().iniciarSesion(nombreUsuario, contrasena) { otpRespuesta ->
                 if (otpRespuesta != null) {
@@ -47,6 +47,7 @@ class InicioSesionViewModel : ViewModel() {
                         otpRespuesta = otpRespuesta
                     )
                     if (otpRespuesta.solicitarOTP == "True") {
+
                         Log.d("REGISTRO EXITOSO", "Datos válidos")
                         MusicoolEnrutador.navegarHacia(Pantalla.CodigoOTPPantalla)
                     }
@@ -56,7 +57,9 @@ class InicioSesionViewModel : ViewModel() {
             }
         }
     }
+
     private fun mostrarEstado(){
         Log.d("INICIO SESION", inicioSesionUIState.value.toString())
     }
 }
+
