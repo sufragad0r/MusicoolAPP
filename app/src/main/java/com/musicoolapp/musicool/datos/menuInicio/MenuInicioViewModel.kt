@@ -77,7 +77,9 @@ class MenuInicioViewModel : ViewModel() {
                                 cancionDisponible = true
 
                             )
+
                             isPlaying.value = false
+
                         }
                         menuInicioUIState.value = menuInicioUIState.value.copy(
                             nombreCancion = "",
