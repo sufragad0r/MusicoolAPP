@@ -12,6 +12,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.Base64
+import kotlinx.coroutines.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+
 
 class MusicoolAPI {
 
@@ -175,6 +180,21 @@ class MusicoolAPI {
             }
         }.start()
     }
+
+    suspend fun getCancion(id: String, token: String): Song {
+        val url = "http://localhost:8000/obtener-cancion?id=$id"
+        val headers = mapOf("accept" to "application/json", "token" to token)
+        val response = URL(url).openConnection().apply {
+            headers.forEach { addRequestProperty(it.key, it.value) }
+        }.getInputStream().bufferedReader().use { it.readText() }
+
+        return Json.decodeFromString(response)
+    }
+
+    
+
+    @Serializable
+    data class Song(val id: String, val title: String, val artist: String)
     data class Usuario(
         val username: String,
         val password: String,
