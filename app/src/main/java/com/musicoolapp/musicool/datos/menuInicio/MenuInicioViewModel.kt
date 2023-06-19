@@ -5,28 +5,27 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.red.MusicoolAPI
-import com.musicoolapp.musicool.sesion.Sesion
 
 class MenuInicioViewModel : ViewModel() {
 
     var menuInicioUIState = mutableStateOf(MenuInicioUIState())
 
-    val mediaPlayer: MediaPlayer = MediaPlayer()
     val isPlaying = mutableStateOf(false)
+    val mediaPlayer = MediaPlayer()
 
-    fun togglePlay() {
+
+    fun togglePlay(filePath: String) {
         if (isPlaying.value) {
-            mediaPlayer.pause()
-        } else {
+            mediaPlayer.reset()
+            mediaPlayer.setDataSource(filePath)
+            mediaPlayer.prepare()
             mediaPlayer.start()
+        } else {
+            mediaPlayer.stop()
         }
         isPlaying.value = !isPlaying.value
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        mediaPlayer.release()
-    }
 
     fun onEvent(event: MenuInicioUIEvent){
         when(event){
@@ -43,7 +42,7 @@ class MenuInicioViewModel : ViewModel() {
         }
     }
 
-    fun buscarCancion(token: String) {
+     fun buscarCancion(token: String) {
 
         if (menuInicioUIState.value.nombreCancion.isNullOrBlank() && menuInicioUIState.value.artista.isNullOrBlank()){
             menuInicioUIState.value = menuInicioUIState.value.copy(
@@ -51,14 +50,60 @@ class MenuInicioViewModel : ViewModel() {
                 artistaError = menuInicioUIState.value.artista.isNullOrBlank()
             )
         }else{
-            MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ id ->
-                menuInicioUIState.value = menuInicioUIState.value.copy(
-                    id = id.toString()
-                )
-            }
-            Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
-        }
+            menuInicioUIState.value = menuInicioUIState.value.copy(
+                cancionDisponible = false,
+            )
+            mediaPlayer.stop()
+             MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
+                if (cancion != null) {
+                    menuInicioUIState.value = menuInicioUIState.value.copy(
+                        id = cancion.id,
+                        fechaDePublicacion = cancion.fechaDePublicacion,
+                        artista = cancion.artista,
+                        nombreCancion = cancion.nombre
+                    )
+                    MusicoolAPI().buscarImagen(token, menuInicioUIState.value.id){imagen ->
+                        if (imagen != null){
+                            menuInicioUIState.value = menuInicioUIState.value.copy(
+                                imagen = imagen
+                            )
+                        }
 
+                    }
+                    MusicoolAPI().obtenerCancion(token, menuInicioUIState.value.id){ archivo ->
+                        if (archivo != null) {
+                            menuInicioUIState.value = menuInicioUIState.value.copy(
+                                rutaDelCelularDeCancion = archivo.absolutePath.toString(),
+                                cancionDisponible = true
+
+                            )
+
+
+                        }
+                    }
+
+
+                    Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
+                }
+
+                }
+            }
+    }
+
+    fun playMusic(filePath: String) {
+        mediaPlayer.reset()
+        mediaPlayer.setDataSource(filePath)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
+    }
+
+    fun stopMusic() {
+        mediaPlayer.stop()
+    }
+
+    override fun onCleared() {
+        mediaPlayer.release()
+        super.onCleared()
     }
 
 
