@@ -116,7 +116,7 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                     mediaPlayer = menuInicioViewModel.mediaPlayer,
                     isPlaying = menuInicioViewModel.isPlaying.value,
                     onTogglePlay = {
-                        menuInicioViewModel.isPlaying
+                        menuInicioViewModel.togglePlay(menuInicioViewModel.menuInicioUIState.value.rutaDelCelularDeCancion)
                     }
                 )
             }else{

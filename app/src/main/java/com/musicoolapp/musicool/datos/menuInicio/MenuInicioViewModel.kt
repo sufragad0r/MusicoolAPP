@@ -14,11 +14,14 @@ class MenuInicioViewModel : ViewModel() {
     val mediaPlayer = MediaPlayer()
 
 
-    fun togglePlay() {
+    fun togglePlay(filePath: String) {
         if (isPlaying.value) {
-            mediaPlayer.pause()
-        } else {
+            mediaPlayer.reset()
+            mediaPlayer.setDataSource(filePath)
+            mediaPlayer.prepare()
             mediaPlayer.start()
+        } else {
+            mediaPlayer.stop()
         }
         isPlaying.value = !isPlaying.value
     }
@@ -48,8 +51,9 @@ class MenuInicioViewModel : ViewModel() {
             )
         }else{
             menuInicioUIState.value = menuInicioUIState.value.copy(
-                cancionDisponible = false
+                cancionDisponible = false,
             )
+            mediaPlayer.stop()
              MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
                 if (cancion != null) {
                     menuInicioUIState.value = menuInicioUIState.value.copy(
@@ -73,7 +77,6 @@ class MenuInicioViewModel : ViewModel() {
                                 cancionDisponible = true
 
                             )
-                            mediaPlayer.setDataSource(menuInicioUIState.value.rutaDelCelularDeCancion)
 
 
                         }
