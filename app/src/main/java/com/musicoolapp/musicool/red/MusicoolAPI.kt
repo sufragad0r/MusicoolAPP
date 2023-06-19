@@ -1,23 +1,21 @@
 package com.musicoolapp.musicool.red
 
-import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Environment
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.Base64
 import kotlinx.coroutines.*
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -187,10 +185,10 @@ class MusicoolAPI {
         }.start()
     }
 
-    fun buscarImagen(token: String, id: String, callback: (ByteArray?) -> Unit) {
+     fun buscarImagen(token: String, id: String, callback: (ImageBitmap?) -> Unit) {
         Thread {
             try {
-                val url = BASE_URL+ "buscar-imagen"
+                val url = BASE_URL + "buscar-imagen"
                 val params = listOf("id" to id)
                 val headers = mapOf(
                     "accept" to "application/json",
@@ -213,24 +211,41 @@ class MusicoolAPI {
                     }
 
                     val imageData = outputStream.toByteArray()
-                    callback(imageData)
-                    Log.d("BUSCAR IMAGEN", "Imagen encontrada")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val imageBitmap = decodeByteArrayToBitmap(imageData)
+                        withContext(Dispatchers.Main) {
+                            callback(imageBitmap)
+                        }
+                    }
+                    println("Imagen encontrada")
                 } else {
                     callback(null)
-                    Log.e("BUSCAR IMAGEN", "No se pudo obtener la imagen")
+                    println("No se pudo obtener la imagen")
                 }
 
                 connection.disconnect()
             } catch (e: Exception) {
-                Log.e("BUSCAR IMAGEN", "Error en la solicitud: ${e.message}")
+                println("Error en la solicitud: ${e.message}")
                 callback(null)
             }
         }.start()
     }
-    fun obtenerCancion(token: String, id: String, callback: (File?) -> Unit) {
+
+    suspend fun decodeByteArrayToBitmap(byteArray: ByteArray): ImageBitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                bitmap.asImageBitmap()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+    fun obtenerCancion(token: String, id: String?, callback: (File?) -> Unit) {
         Thread {
             try {
-                val url = BASE_URL+"obtener-cancion";
+                val url = BASE_URL + "obtener-cancion"
                 val params = listOf("id" to id)
                 val headers = mapOf(
                     "accept" to "audio/mpeg",
@@ -244,7 +259,7 @@ class MusicoolAPI {
                 val responseCode = connection.responseCode
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     val inputStream = connection.inputStream
-                    val file = guardarArchivoMP3(inputStream, id)
+                    val file = guardarArchivoMP3(inputStream, id.toString())
                     callback(file)
                     Log.d("OBTENER CANCION", "Canción descargada y guardada")
                 } else {
@@ -259,26 +274,32 @@ class MusicoolAPI {
             }
         }.start()
     }
-    fun guardarArchivoMP3(inputStream: java.io.InputStream, id: String): File? {
-        val filePath = "/canciones/$id.mp3"
-        val file = File(filePath)
-        try {
-            val outputStream = FileOutputStream(file)
-            val buffer = ByteArray(1024)
-            var bytesRead: Int
-            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                outputStream.write(buffer, 0, bytesRead)
-            }
-            outputStream.close()
-            Log.e("GUARDAR ARCHIVO", "Se guardo el archivo en : ${file.absolutePath}")
 
-            return file
-        } catch (e: Exception) {
-            Log.e("GUARDAR ARCHIVO", "Error al guardar el archivo: ${e.message}")
+    fun guardarArchivoMP3(inputStream: InputStream, fileName: String): File? {
+        val externalStorageState = Environment.getExternalStorageState()
+        if (Environment.MEDIA_MOUNTED != externalStorageState) {
+            // El almacenamiento externo no está montado o no está disponible
+            return null
         }
-        return null
-    }
 
+        val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+        val file = File(downloadsFolder, fileName+".mp3")
+
+        return try {
+            FileOutputStream(file).use { outputStream ->
+                val buffer = ByteArray(1024)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                }
+                outputStream.flush()
+            }
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
 
     fun buscarCancion(token: String, cancion: String, artista: String, callback: (Cancion?) -> Unit) {

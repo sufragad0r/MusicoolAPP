@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.musicoolapp.musicool.red.MusicoolAPI
-import com.musicoolapp.musicool.sesion.Sesion
 
 class MenuInicioViewModel : ViewModel() {
 
@@ -25,7 +24,7 @@ class MenuInicioViewModel : ViewModel() {
         }
     }
 
-    fun buscarCancion(token: String) {
+     fun buscarCancion(token: String) {
 
         if (menuInicioUIState.value.nombreCancion.isNullOrBlank() && menuInicioUIState.value.artista.isNullOrBlank()){
             menuInicioUIState.value = menuInicioUIState.value.copy(
@@ -33,15 +32,36 @@ class MenuInicioViewModel : ViewModel() {
                 artistaError = menuInicioUIState.value.artista.isNullOrBlank()
             )
         }else{
-            MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
+             MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
                 if (cancion != null) {
                     menuInicioUIState.value = menuInicioUIState.value.copy(
-                        id = cancion.id + cancion.artista + cancion.nombre + cancion.fechaDePublicacion
+                        id = cancion.id,
+                        fechaDePublicacion = cancion.fechaDePublicacion,
+                        artista = cancion.artista,
+                        nombreCancion = cancion.nombre
                     )
+                    MusicoolAPI().buscarImagen(token, menuInicioUIState.value.id){imagen ->
+                        if (imagen != null){
+                            menuInicioUIState.value = menuInicioUIState.value.copy(
+                                imagen = imagen
+                            )
+                        }
+
+                    }
+                    MusicoolAPI().obtenerCancion(token, menuInicioUIState.value.id){ archivo ->
+                        if (archivo != null) {
+                            menuInicioUIState.value = menuInicioUIState.value.copy(
+                                rutaDelCelularDeCancion = archivo.absolutePath.toString())
+                        }
+                    }
+
+                    Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
+                }
+
                 }
             }
-            Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
-        }
+
+
 
     }
 

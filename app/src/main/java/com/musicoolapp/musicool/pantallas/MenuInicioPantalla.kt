@@ -1,5 +1,7 @@
 package com.musicoolapp.musicool.pantallas
 
+import android.media.Image
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -111,6 +113,14 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                 tamano = 20,
                 modifier = Modifier
             )
+            TextoBold(
+                texto = menuInicioViewModel.menuInicioUIState.value.rutaDelCelularDeCancion,
+                color = colorResource(id = R.color.texto),
+                tamano = 20,
+                modifier = Modifier
+            )
+            menuInicioViewModel.menuInicioUIState.value.imagen?.let { Image(bitmap = it, contentDescription = menuInicioViewModel.menuInicioUIState.value.nombreCancion) }
+
 
         }
     }
