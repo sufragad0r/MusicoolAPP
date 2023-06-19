@@ -52,9 +52,8 @@ class MusicoolAPI {
                     val gson = Gson()
                     val responseData = gson.fromJson(response, SolicitarOTP::class.java)
 
-                    // Imprimir los datos del objeto
+
                     Log.d("INICIO SESION API", "solicitarOTP: ${responseData.solicitarOTP}")
-                    Log.d("INICIO SESION API", "info: ${responseData.info}")
 
                     callback(responseData)
                 } else {
