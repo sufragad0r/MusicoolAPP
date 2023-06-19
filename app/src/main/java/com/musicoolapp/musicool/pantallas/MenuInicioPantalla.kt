@@ -1,5 +1,6 @@
 package com.musicoolapp.musicool.pantallas
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,12 +21,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.musicoolapp.musicool.R
 import com.musicoolapp.musicool.componentes.Boton
 import com.musicoolapp.musicool.componentes.Formulario
-import com.musicoolapp.musicool.componentes.Musicool
 import com.musicoolapp.musicool.componentes.TextoBold
 import com.musicoolapp.musicool.componentes.TextoSemiBold
 import com.musicoolapp.musicool.datos.menuInicio.MenuInicioUIEvent
@@ -41,6 +39,7 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
 
     val dataStore = Sesion(context)
 
+
     Surface(
         color = colorResource(id = R.color.fondo),
         modifier = Modifier
@@ -49,7 +48,7 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
             .padding(16.dp)
     ){
         Column(
-            modifier = Modifier
+
         ){
             Spacer(modifier = Modifier.height(50.dp))
             TextoBold(texto = "Escucha lo que quieras", color = colorResource(id = R.color.texto), tamano = 35, modifier = Modifier)
@@ -86,11 +85,12 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                     modifier = Modifier.width(100.dp)
                 ){
                     Boton(nombre = "Buscar", cuandoLoPulsen = {
-                        
+                        menuInicioViewModel.onEvent(MenuInicioUIEvent.botonBuscarClickeado)
                     })
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
+
         }
     }
 }
