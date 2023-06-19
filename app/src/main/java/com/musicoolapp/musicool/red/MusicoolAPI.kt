@@ -1,6 +1,8 @@
 package com.musicoolapp.musicool.red
 
+import android.content.Context
 import android.os.Build
+import android.os.Environment
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
@@ -16,6 +18,10 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 
 class MusicoolAPI {
@@ -181,17 +187,148 @@ class MusicoolAPI {
         }.start()
     }
 
-    suspend fun getCancion(id: String, token: String): Song {
-        val url = "http://localhost:8000/obtener-cancion?id=$id"
-        val headers = mapOf("accept" to "application/json", "token" to token)
-        val response = URL(url).openConnection().apply {
-            headers.forEach { addRequestProperty(it.key, it.value) }
-        }.getInputStream().bufferedReader().use { it.readText() }
+    fun buscarImagen(token: String, id: String, callback: (ByteArray?) -> Unit) {
+        Thread {
+            try {
+                val url = BASE_URL+ "buscar-imagen"
+                val params = listOf("id" to id)
+                val headers = mapOf(
+                    "accept" to "application/json",
+                    "token" to token
+                )
 
-        return Json.decodeFromString(response)
+                val connection = URL("$url?id=$id").openConnection() as HttpURLConnection
+                connection.setRequestProperty("accept", headers["accept"])
+                connection.setRequestProperty("token", headers["token"])
+
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream = connection.inputStream
+                    val outputStream = ByteArrayOutputStream()
+
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        outputStream.write(buffer, 0, bytesRead)
+                    }
+
+                    val imageData = outputStream.toByteArray()
+                    callback(imageData)
+                    Log.d("BUSCAR IMAGEN", "Imagen encontrada")
+                } else {
+                    callback(null)
+                    Log.e("BUSCAR IMAGEN", "No se pudo obtener la imagen")
+                }
+
+                connection.disconnect()
+            } catch (e: Exception) {
+                Log.e("BUSCAR IMAGEN", "Error en la solicitud: ${e.message}")
+                callback(null)
+            }
+        }.start()
+    }
+    fun obtenerCancion(token: String, id: String, callback: (File?) -> Unit) {
+        Thread {
+            try {
+                val url = BASE_URL+"obtener-cancion";
+                val params = listOf("id" to id)
+                val headers = mapOf(
+                    "accept" to "audio/mpeg",
+                    "token" to token
+                )
+
+                val connection = URL("$url?id=$id").openConnection() as HttpURLConnection
+                connection.setRequestProperty("accept", headers["accept"])
+                connection.setRequestProperty("token", headers["token"])
+
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream = connection.inputStream
+                    val file = guardarArchivoMP3(inputStream, id)
+                    callback(file)
+                    Log.d("OBTENER CANCION", "Canción descargada y guardada")
+                } else {
+                    callback(null)
+                    Log.e("OBTENER CANCION", "No se pudo obtener la canción")
+                }
+
+                connection.disconnect()
+            } catch (e: Exception) {
+                Log.e("OBTENER CANCION", "Error en la solicitud: ${e.message}")
+                callback(null)
+            }
+        }.start()
+    }
+    fun guardarArchivoMP3(inputStream: java.io.InputStream, id: String): File? {
+        val filePath = "/canciones/$id.mp3"
+        val file = File(filePath)
+        try {
+            val outputStream = FileOutputStream(file)
+            val buffer = ByteArray(1024)
+            var bytesRead: Int
+            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                outputStream.write(buffer, 0, bytesRead)
+            }
+            outputStream.close()
+            Log.e("GUARDAR ARCHIVO", "Se guardo el archivo en : ${file.absolutePath}")
+
+            return file
+        } catch (e: Exception) {
+            Log.e("GUARDAR ARCHIVO", "Error al guardar el archivo: ${e.message}")
+        }
+        return null
     }
 
-    
+
+
+    fun buscarCancion(token: String, cancion: String, artista: String, callback: (String?) -> Unit) {
+        Thread {
+            try {
+        val url = BASE_URL+"buscar-cancion"
+        val acceptHeader = "application/json"
+
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("accept", acceptHeader)
+        connection.setRequestProperty("token", token)
+        connection.setRequestProperty("Content-Type", "application/json")
+        connection.doOutput = true
+
+        val requestBody = """
+        {
+            "id": "lorem",
+            "nombre": "$cancion",
+            "artista": "$artista",
+            "fechaDePublicacion": "lorem"
+        }
+    """.trimIndent()
+
+        val outputStream = DataOutputStream(connection.outputStream)
+        outputStream.writeBytes(requestBody)
+        outputStream.flush()
+        outputStream.close()
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            val bufferedReader = BufferedReader(InputStreamReader(connection.inputStream))
+            val response = bufferedReader.use(BufferedReader::readText)
+            bufferedReader.close()
+            callback(response)
+            Log.d("ID CANCION", "El id de la cancion es : $response")
+        } else {
+            callback(null)
+            Log.e("BUSCAR CANCION", "No se encontro una canción")
+
+        }
+        connection.disconnect()
+            } catch (e: Exception) {
+                Log.e("BUSCAR CANCION", "Error en la solicitud: ${e.message}")
+                callback(null)
+            }
+        }.start()
+    }
+
+
 
     @Serializable
     data class Song(val id: String, val title: String, val artist: String)
