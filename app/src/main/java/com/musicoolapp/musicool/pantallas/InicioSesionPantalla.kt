@@ -41,11 +41,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun InicioSesionPantalla(inicioSesionViewModel: InicioSesionViewModel = viewModel()){
 
-    // context
+
     val context = LocalContext.current
-    // scope
+
     val scope = rememberCoroutineScope()
-    // datastore Email
+
     val dataStore = Sesion(context)
 
 

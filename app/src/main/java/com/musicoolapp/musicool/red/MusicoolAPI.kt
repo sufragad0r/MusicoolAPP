@@ -26,7 +26,7 @@ import java.io.InputStream
 
 class MusicoolAPI {
 
-    val BASE_URL = "http://192.168.100.11:8000/"
+    val BASE_URL = "http://192.168.1.161:8000/"
     val BASIC_AUTH_KEY = "clienteMovil"
     val BASIC_AUTH_VALUE ="fR5^hN7*oP#2"
 
