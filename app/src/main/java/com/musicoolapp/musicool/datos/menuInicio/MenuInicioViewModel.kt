@@ -68,7 +68,6 @@ class MenuInicioViewModel : ViewModel() {
                                 imagen = imagen
                             )
                         }
-
                     }
                     MusicoolAPI().obtenerCancion(token, menuInicioUIState.value.id){ archivo ->
                         if (archivo != null) {
@@ -77,9 +76,12 @@ class MenuInicioViewModel : ViewModel() {
                                 cancionDisponible = true
 
                             )
-
-
                         }
+                        menuInicioUIState.value = menuInicioUIState.value.copy(
+                            nombreCancion = "",
+                            artista = "",
+                            id = ""
+                        )
                     }
 
 
