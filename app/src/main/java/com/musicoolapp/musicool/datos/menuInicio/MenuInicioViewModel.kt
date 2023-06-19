@@ -1,5 +1,6 @@
 package com.musicoolapp.musicool.datos.menuInicio
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,23 @@ import com.musicoolapp.musicool.sesion.Sesion
 class MenuInicioViewModel : ViewModel() {
 
     var menuInicioUIState = mutableStateOf(MenuInicioUIState())
+
+    val mediaPlayer: MediaPlayer = MediaPlayer()
+    val isPlaying = mutableStateOf(false)
+
+    fun togglePlay() {
+        if (isPlaying.value) {
+            mediaPlayer.pause()
+        } else {
+            mediaPlayer.start()
+        }
+        isPlaying.value = !isPlaying.value
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        mediaPlayer.release()
+    }
 
     fun onEvent(event: MenuInicioUIEvent){
         when(event){

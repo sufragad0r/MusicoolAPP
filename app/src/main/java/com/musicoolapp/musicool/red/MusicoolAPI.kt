@@ -1,32 +1,25 @@
 package com.musicoolapp.musicool.red
-
-import android.content.Context
 import android.os.Build
-import android.os.Environment
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.Base64
 import kotlinx.coroutines.*
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 
 
 class MusicoolAPI {
 
-    val BASE_URL = "http://192.168.56.1:8000/"
+    val BASE_URL = "http://192.168.1.161:8000/"
     val BASIC_AUTH_KEY = "clienteMovil"
     val BASIC_AUTH_VALUE ="fR5^hN7*oP#2"
 

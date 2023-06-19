@@ -4,6 +4,7 @@ data class MenuInicioUIState(
     var nombreCancion: String = "",
     var artista: String = "",
     var id: String = "",
+    var cancionDisponible: Boolean = false,
 
     var nombreCancionError: Boolean = false,
     var artistaError: Boolean = false
