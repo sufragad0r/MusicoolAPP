@@ -3,6 +3,8 @@ package com.musicoolapp.musicool.datos.menuInicio
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.musicoolapp.musicool.red.MusicoolAPI
+import com.musicoolapp.musicool.sesion.Sesion
 
 class MenuInicioViewModel : ViewModel() {
 
@@ -20,13 +22,10 @@ class MenuInicioViewModel : ViewModel() {
                     artista = event.artista
                 )
             }
-            is MenuInicioUIEvent.botonBuscarClickeado ->{
-                buscarCancion()
-            }
         }
     }
 
-    private fun buscarCancion() {
+    fun buscarCancion(token: String) {
 
         if (menuInicioUIState.value.nombreCancion.isNullOrBlank() && menuInicioUIState.value.artista.isNullOrBlank()){
             menuInicioUIState.value = menuInicioUIState.value.copy(
@@ -34,6 +33,11 @@ class MenuInicioViewModel : ViewModel() {
                 artistaError = menuInicioUIState.value.artista.isNullOrBlank()
             )
         }else{
+            MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ id ->
+                menuInicioUIState.value = menuInicioUIState.value.copy(
+                    id = id.toString()
+                )
+            }
             Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
         }
 

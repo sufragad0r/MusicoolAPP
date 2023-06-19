@@ -11,8 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +45,9 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
 
     val dataStore = Sesion(context)
 
+    val token: String = dataStore.conseguirToken.collectAsState(
+        initial = ""
+    ).value ?: ""
 
     Surface(
         color = colorResource(id = R.color.fondo),
@@ -77,6 +86,7 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                 }, hayError = menuInicioViewModel.menuInicioUIState.value.artistaError)
             }
             Spacer(modifier = Modifier.height(10.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -85,12 +95,17 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                     modifier = Modifier.width(100.dp)
                 ){
                     Boton(nombre = "Buscar", cuandoLoPulsen = {
-                        menuInicioViewModel.onEvent(MenuInicioUIEvent.botonBuscarClickeado)
+                        menuInicioViewModel.buscarCancion(token)
                     })
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-
+            TextoBold(
+                texto = menuInicioViewModel.menuInicioUIState.value.id,
+                color = colorResource(id = R.color.texto),
+                tamano = 20,
+                modifier = Modifier
+            )
         }
     }
 }
