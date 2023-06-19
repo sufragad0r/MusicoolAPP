@@ -111,6 +111,7 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
                 tamano = 20,
                 modifier = Modifier
             )
+
         }
     }
 }

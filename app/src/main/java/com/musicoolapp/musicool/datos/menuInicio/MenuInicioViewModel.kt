@@ -33,10 +33,12 @@ class MenuInicioViewModel : ViewModel() {
                 artistaError = menuInicioUIState.value.artista.isNullOrBlank()
             )
         }else{
-            MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ id ->
-                menuInicioUIState.value = menuInicioUIState.value.copy(
-                    id = id.toString()
-                )
+            MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
+                if (cancion != null) {
+                    menuInicioUIState.value = menuInicioUIState.value.copy(
+                        id = cancion.id + cancion.artista + cancion.nombre + cancion.fechaDePublicacion
+                    )
+                }
             }
             Log.d("BUSCAR CANCION", "BUSQUEDA VALIDA")
         }

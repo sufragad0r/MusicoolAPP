@@ -18,6 +18,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -26,7 +27,7 @@ import java.io.InputStream
 
 class MusicoolAPI {
 
-    val BASE_URL = "http://192.168.56.1:8000/"
+    val BASE_URL = "http://192.168.100.11:8000/"
     val BASIC_AUTH_KEY = "clienteMovil"
     val BASIC_AUTH_VALUE ="fR5^hN7*oP#2"
 
@@ -280,46 +281,53 @@ class MusicoolAPI {
 
 
 
-    fun buscarCancion(token: String, cancion: String, artista: String, callback: (String?) -> Unit) {
+    fun buscarCancion(token: String, cancion: String, artista: String, callback: (Cancion?) -> Unit) {
         Thread {
             try {
-        val url = BASE_URL+"buscar-cancion"
-        val acceptHeader = "application/json"
+                val url = BASE_URL + "buscar-cancion"
+                val acceptHeader = "application/json"
 
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("accept", acceptHeader)
-        connection.setRequestProperty("token", token)
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.doOutput = true
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("accept", acceptHeader)
+                connection.setRequestProperty("token", token)
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
 
-        val requestBody = """
-        {
-            "id": "lorem",
-            "nombre": "$cancion",
-            "artista": "$artista",
-            "fechaDePublicacion": "lorem"
-        }
-    """.trimIndent()
+                val requestBody = """
+                {
+                    "id": "lorem",
+                    "nombre": "$cancion",
+                    "artista": "$artista",
+                    "fechaDePublicacion": "lorem"
+                }
+            """.trimIndent()
 
-        val outputStream = DataOutputStream(connection.outputStream)
-        outputStream.writeBytes(requestBody)
-        outputStream.flush()
-        outputStream.close()
+                val outputStream = DataOutputStream(connection.outputStream)
+                outputStream.writeBytes(requestBody)
+                outputStream.flush()
+                outputStream.close()
 
-        val responseCode = connection.responseCode
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            val bufferedReader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = bufferedReader.use(BufferedReader::readText)
-            bufferedReader.close()
-            callback(response)
-            Log.d("ID CANCION", "El id de la cancion es : $response")
-        } else {
-            callback(null)
-            Log.e("BUSCAR CANCION", "No se encontro una canción")
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val bufferedReader = BufferedReader(InputStreamReader(connection.inputStream))
+                    val response = bufferedReader.use(BufferedReader::readText)
+                    bufferedReader.close()
 
-        }
-        connection.disconnect()
+                    val jsonObject = JSONObject(response)
+                    val id = jsonObject.getString("id")
+                    val nombre = jsonObject.getString("nombre")
+                    val artista = jsonObject.getString("artista")
+                    val fechaDePublicacion = jsonObject.getString("fechaDePublicacion")
+                    val cancionObjeto = Cancion(id, nombre, artista, fechaDePublicacion)
+
+                    callback(cancionObjeto)
+                    Log.d("ID CANCION", "El id de la canción es : $id")
+                } else {
+                    callback(null)
+                    Log.e("BUSCAR CANCION", "No se encontró una canción")
+                }
+                connection.disconnect()
             } catch (e: Exception) {
                 Log.e("BUSCAR CANCION", "Error en la solicitud: ${e.message}")
                 callback(null)
@@ -329,13 +337,19 @@ class MusicoolAPI {
 
 
 
-    @Serializable
-    data class Song(val id: String, val title: String, val artist: String)
+
     data class Usuario(
         val username: String,
         val password: String,
         val telefono: String
         )
+    data class Cancion(
+        val id: String,
+        val nombre: String,
+        val artista: String,
+        val fechaDePublicacion: String
+    )
+
 
 
 }
