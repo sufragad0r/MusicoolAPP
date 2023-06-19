@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,10 +34,21 @@ import com.musicoolapp.musicool.datos.registroUsuario.RegistroUsuarioUIEvent
 import com.musicoolapp.musicool.navegacion.MusicoolEnrutador
 import com.musicoolapp.musicool.navegacion.Pantalla
 import com.musicoolapp.musicool.navegacion.SystemBackButtonHandler
+import com.musicoolapp.musicool.sesion.Sesion
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun InicioSesionPantalla(inicioSesionViewModel: InicioSesionViewModel = viewModel()){
+
+
+    val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+
+    val dataStore = Sesion(context)
+
+
     Surface(
         color = colorResource(id = R.color.fondo),
         modifier = Modifier
@@ -72,8 +85,13 @@ fun InicioSesionPantalla(inicioSesionViewModel: InicioSesionViewModel = viewMode
             Spacer(modifier = Modifier.height(50.dp))
             Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
                 Boton(nombre = "Ingresar", cuandoLoPulsen = {
+                    scope.launch {
+                        dataStore.guardarNombreUsuario(inicioSesionViewModel.inicioSesionUIState.value.nombreUsuario)
+                    }
+
                     inicioSesionViewModel.onEvent(
-                        InicioSesionUIEvent.botonDeIniciarSesionClickeado)
+                        InicioSesionUIEvent.botonDeIniciarSesionClickeado
+                    )
                 })
             }
             Spacer(modifier = Modifier.height(15.dp))
