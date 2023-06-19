@@ -53,14 +53,15 @@ class MenuInicioViewModel : ViewModel() {
             menuInicioUIState.value = menuInicioUIState.value.copy(
                 cancionDisponible = false,
             )
-            mediaPlayer.stop()
              MusicoolAPI().buscarCancion(token, menuInicioUIState.value.nombreCancion, menuInicioUIState.value.artista ){ cancion ->
                 if (cancion != null) {
                     menuInicioUIState.value = menuInicioUIState.value.copy(
                         id = cancion.id,
                         fechaDePublicacion = cancion.fechaDePublicacion,
                         artista = cancion.artista,
-                        nombreCancion = cancion.nombre
+                        nombreCancion = cancion.nombre,
+                        cancionActual = cancion.nombre,
+                        artistaActual = cancion.artista
                     )
                     MusicoolAPI().buscarImagen(token, menuInicioUIState.value.id){imagen ->
                         if (imagen != null){
@@ -76,6 +77,7 @@ class MenuInicioViewModel : ViewModel() {
                                 cancionDisponible = true
 
                             )
+                            isPlaying.value = false
                         }
                         menuInicioUIState.value = menuInicioUIState.value.copy(
                             nombreCancion = "",
