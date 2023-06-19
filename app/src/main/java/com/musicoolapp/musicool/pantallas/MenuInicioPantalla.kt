@@ -112,6 +112,22 @@ fun MenuInicioPantalla(menuInicioViewModel: MenuInicioViewModel = viewModel()) {
             }
             Spacer(modifier = Modifier.height(15.dp))
             if(menuInicioViewModel.menuInicioUIState.value.cancionDisponible){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    TextoBold(texto = menuInicioViewModel.menuInicioUIState.value.cancionActual, color = colorResource(
+                        id = R.color.texto
+                    ), tamano = 30, modifier = Modifier)
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    TextoSemiBold(texto = menuInicioViewModel.menuInicioUIState.value.artistaActual, color = colorResource(
+                        id = R.color.moradoCool
+                    ), tamano = 15, modifier = Modifier)
+                }
                 ReproductorMusica(
                     mediaPlayer = menuInicioViewModel.mediaPlayer,
                     isPlaying = menuInicioViewModel.isPlaying.value,
